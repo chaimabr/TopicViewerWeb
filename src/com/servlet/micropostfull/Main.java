@@ -90,7 +90,9 @@ public class Main extends HttpServlet {
         
         System.out.println(timeslot+"  "+dat+"  "+menu);
         /***** Twitter Api  ****/
-        
+        try{
+    	    new File("data.json").delete();
+    	    }catch(Exception e){}
         ConfigurationBuilder cb = new ConfigurationBuilder();
 		cb.setDebugEnabled(true)
 		  .setOAuthConsumerKey("bJlsALLd7Gvaaeqp2a0ay5QZC")
@@ -110,13 +112,14 @@ public class Main extends HttpServlet {
 			e1.printStackTrace();
 		}
            sdf.applyPattern(NEW_FORMAT);
-           newDate = sdf.format(d); 
-	    Query query =(new  Query(keyword)).until(newDate);
+           
+           for(int i=0;i<2;i++){
+        	   d = DateUtils.addDays(d,(-1)*i);
+        	   newDate = sdf.format(d);
+	    Query query =(new  Query(keyword)).until(newDate).count(100);
 	    QueryResult queryResult;
-	    try{
-	    new File("data.json").delete();
-	    }catch(Exception e){}
-	    FileWriter fileWriten = new FileWriter(new File("data.json"));
+
+	    FileWriter fileWriten = new FileWriter(new File("data.json"),true);
 		BufferedWriter bufferWrn = new BufferedWriter(fileWriten);
 		try {
 			queryResult = twitter.search(query);
@@ -129,7 +132,7 @@ public class Main extends HttpServlet {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
+           }
 		try {
 			
 			result = DoIt(Integer.parseInt(timeslot),dat,menu);
@@ -218,7 +221,7 @@ public class Main extends HttpServlet {
 		//System.out.println(tweets.get(0).getCreated_at());
 		//System.out.println(tweets.get(1).getCreated_at());
 		System.out.println("Date + Timeslot"+ DateUtils.addMinutes(startdate,timeslot));
-		
+		String result="";
 		int i=0;
 		for(i=0;i < tweets.size();i++){
 			if(
@@ -230,6 +233,7 @@ public class Main extends HttpServlet {
 		}
 	
 		System.out.println("Array size: "+timeslotTweets.size());
+		if (!(timeslotTweets.isEmpty())){
 		String filename1 = CreateFileFromTweets(timeslotTweets,0);
 		
 		Date newdate = DateUtils.addMinutes(startdate,-1 * timeslot);
@@ -248,8 +252,8 @@ public class Main extends HttpServlet {
 		// TMM
 		
 		
-		String result = TMM(methodChoice,filename1,filename2);
-		
+		 result = TMM(methodChoice,filename1,filename2);
+		}
 		return result;
 	}
 	
