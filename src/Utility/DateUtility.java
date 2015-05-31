@@ -8,7 +8,7 @@ import java.util.Locale;
 
 
 public class DateUtility {
-	private static final String TWITTER_DATE_FORMAT ="MMM dd, yyyy HH:mm:ss a";
+	private static final String TWITTER_DATE_FORMAT = "EEE MMM dd HH:mm:ss Z yyyy";
 	public static Date stringToDate(String datestring) throws ParseException{
 		Date twiDate = new Date();
 		SimpleDateFormat df = new SimpleDateFormat(TWITTER_DATE_FORMAT, Locale.ENGLISH);

@@ -23,6 +23,12 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import org.apache.commons.lang.time.DateUtils;
 
@@ -32,11 +38,17 @@ import tmm.data.DataLoader;
 import Utility.DateUtility;
 
 import com.google.gson.Gson;
+import com.timeline.Asset;
+import com.timeline.Timeline;
+import com.timeline.Timeline_;
 import com.twitter.Tweet;
 
 import twitter4j.*;
 import twitter4j.conf.ConfigurationBuilder;
 
+import org.w3c.dom.Attr;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * Servlet implementation class Main
@@ -47,7 +59,10 @@ public class Main extends HttpServlet {
 	static String str;
 	static String dataDirectory,tweetsFile;
 	static List<String> stopWords = new LinkedList<String>();
-	//private static final String TWITTER_DATE_FORMAT = "EEE MMM dd HH:mm:ss Z yyyy";
+	private static final String TWITTER_DATE_FORMAT = "EEE MMM dd HH:mm:ss Z yyyy";
+	private static final String New_DATE_FORMAT = "EEE MMM dd yyyy HH:mm:ss Z";
+	private static SimpleDateFormat df = new SimpleDateFormat(TWITTER_DATE_FORMAT, Locale.ENGLISH);
+	private static SimpleDateFormat new_df = new SimpleDateFormat(New_DATE_FORMAT, Locale.ENGLISH);
 	//private static final String TWITTER_DATE_FORMAT ="MMM dd, yyyy HH:mm:ss a";
 
 	static Gson gson = new Gson();
@@ -63,9 +78,11 @@ public class Main extends HttpServlet {
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
+	s */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
+		
+		doPost(request,response);
 	}	
 	
 	
@@ -77,65 +94,20 @@ public class Main extends HttpServlet {
 		// TODO Auto-generated method stub
 		try{
 			
-		
-		String result="";
-		
-        String dat = request.getParameter("date");
-        String timeslot = request.getParameter("timeslot");
+			Asset asset = new Asset();
+			Timeline timeline = new Timeline();
+			timeline.setTimeline(new Timeline_());
+			timeline.getTimeline().setType("default");
+			timeline.getTimeline().setAsset(asset);
+	
+		  String timeslot = request.getParameter("timeslot");
         //System.out.println("\nType 1(LDA), 2(Doc-p), 3(GraphBased), 4(sfim), 5(BNgram)");
         String menu = request.getParameter("menu");
-        String keyword = request.getParameter("keyword");
         
-       // System.out.println(keyword+" "+dat+"  "+time1+"   "+time2+"  "+menu);
-        
-        System.out.println(timeslot+"  "+dat+"  "+menu);
-        /***** Twitter Api  ****/
-        try{
-    	    new File("data.json").delete();
-    	    }catch(Exception e){}
-        ConfigurationBuilder cb = new ConfigurationBuilder();
-		cb.setDebugEnabled(true)
-		  .setOAuthConsumerKey("bJlsALLd7Gvaaeqp2a0ay5QZC")
-		  .setOAuthConsumerSecret("vvBmATRDExtO9SjCHz56r21pEyNdJwgVVkcizVCe0JOdrMMQ4d")
-		  .setOAuthAccessToken("925353571-frp0XXINItS3Udl1YxMjWsczgjXoX6tUOeIcqzzB")
-		  .setOAuthAccessTokenSecret("Ur3RD1EaACazKLgtVmF48hSafQIwkcImtBm9qNBsBirDw");
-		TwitterFactory tf = new TwitterFactory(cb.build());
-		Twitter twitter = tf.getInstance();
-		  final String OLD_FORMAT = "dd/MM/yyyy";
-           final String NEW_FORMAT = "yyyy-MM-dd";
-           String newDate;
-           SimpleDateFormat sdf = new SimpleDateFormat(OLD_FORMAT);
-           Date d=null;
-		try {
-			d = sdf.parse(dat);
-		} catch (ParseException e1) {
-			e1.printStackTrace();
-		}
-           sdf.applyPattern(NEW_FORMAT);
-           
-           for(int i=0;i<2;i++){
-        	   d = DateUtils.addDays(d,(-1)*i);
-        	   newDate = sdf.format(d);
-	    Query query =(new  Query(keyword)).until(newDate).count(100);
-	    QueryResult queryResult;
-
-	    FileWriter fileWriten = new FileWriter(new File("data.json"),true);
-		BufferedWriter bufferWrn = new BufferedWriter(fileWriten);
-		try {
-			queryResult = twitter.search(query);
-			for (Status status : queryResult.getTweets()) {
-				bufferWrn.write(gson.toJson(status)+"\n");
-		    }
-			bufferWrn.close();	
-			//System.out.println(result.getTweets());
-		} catch (TwitterException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-           }
 		try {
 			
-			result = DoIt(Integer.parseInt(timeslot),dat,menu);
+			List<com.timeline.Date> timelineElements = DoIt(Integer.parseInt(timeslot),menu);
+			timeline.getTimeline().setDate(timelineElements);
 			
 			
 		} catch (NumberFormatException e) {
@@ -149,12 +121,48 @@ public class Main extends HttpServlet {
         /**********************************/
        
 	        
-	        response.setContentType("text/html;charset=UTF-8");
+	        response.setContentType("text/xml");
 	        PrintWriter out = response.getWriter();
+	       //out.println("Hello");
 	        try {
 	            /*  output   */
-	
-	            out.println(result);
+	        //String timelineJson = gson.toJson(timeline);
+	        	//System.out.println(timelineJson);
+	        	
+	        	
+	        	DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+	    		DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+	    		
+	    		// root elements
+	    		Document doc = docBuilder.newDocument();
+	    		Element rootElement = doc.createElement("data");
+	    		rootElement.setAttribute("wiki-url", "http://simile.mit.edu/shelf/");
+	    		rootElement.setAttribute("wiki-section", "Simile JFK Timeline");
+	    		doc.appendChild(rootElement);
+	    		
+	    		System.out.println(timeline.getTimeline().getDate().size());
+	    		
+	    		for(com.timeline.Date date : timeline.getTimeline().getDate()){
+		    		Element event = doc.createElement("event");
+		    		event.setAttribute("start", date.getStartDate());
+		    		event.setAttribute("title", date.getHeadline());
+		    		event.setAttribute("isDuration", "false");
+		    		rootElement.appendChild(event);
+	    		}
+	    		
+	    		//System.out.println("XML:"+doc.getTextContent());
+	            //out.println(doc.getTextContent());
+	    		
+	    		// write the content into xml file
+	    		TransformerFactory transformerFactory = TransformerFactory.newInstance();
+	    		Transformer transformer = transformerFactory.newTransformer();
+	    		DOMSource source = new DOMSource(doc);
+	    		StreamResult result1 = new StreamResult(out);
+	     
+	    		// Output to console for testing
+	    		// StreamResult result = new StreamResult(System.out);
+	     
+	    		transformer.transform(source, result1);
 	
 	        } finally {
 	            out.close();
@@ -164,53 +172,47 @@ public class Main extends HttpServlet {
 		}
 	}
 
-	private static String DoIt(int timeslot,String dat,String methodChoice) throws Exception{
+	private static List<com.timeline.Date> DoIt(int timeslot,String methodChoice) throws Exception{
 		
-		String result = "";
-		String inputstream = "data.json";
+		List<com.timeline.Date> resultsDate=  new ArrayList();
+		String inputstream = "D:\\MicroFull1\\tweets0.json";
 		BufferedReader bufferRd = new BufferedReader(new FileReader(inputstream)); 
 		String  str="";
 		List<Tweet> tweets = new ArrayList<Tweet>();
 		while((str = bufferRd.readLine()) != null) 
 		{	
-           //System.out.println(str);
-           
+          // System.out.println(str);
            Tweet tweet = gson.fromJson(str, Tweet.class);
            tweets.add(tweet);
 		}
 		bufferRd.close();
 
 		System.out.println("size "+tweets.size()+" tweets" );
-		
-		//System.out.println(tweets.get(0).getCreated_at());
-		//System.exit(0);
-		//Sorted list
+	
 		Collections.sort(tweets);
-		
-		//for(Tweet t : tweets) System.out.println(t.getCreated_at());
-		//System.exit(0);
-		
-		
-		//int i=0;
-		Date startDate = DateUtility.stringToDate(tweets.get(0).getCreated_at());
-		
-		//System.out.println(startDate);
-		//System.exit(1);
+	
+		System.out.println("date = "+tweets.get(0).getCreated_at());
+		if (!(tweets.get(0).getCreated_at()==null)){
+		Date startDate = df.parse(tweets.get(0).getCreated_at());
 		
 		while(
-				startDate.compareTo( DateUtility.stringToDate(tweets.get(tweets.size()-1).getCreated_at())) <= 0
+				startDate.compareTo( df.parse(tweets.get(tweets.size()-1).getCreated_at())) <= 0
 			){
 			
 			System.out.println(startDate);
-			
-			result += startDate.toString() + " : <br/>" +GetTweetsByTimeslot(tweets,startDate,timeslot,dat,methodChoice);
+			String txt = GetTweetsByTimeslot(tweets,startDate,timeslot,methodChoice);
+			System.out.println("txt = "+txt);
 			startDate = DateUtils.addMinutes(startDate, timeslot);
+			com.timeline.Date newDate = new com.timeline.Date();
+			newDate.setHeadline(txt);
+			newDate.setStartDate(new_df.format(startDate));
+			resultsDate.add(newDate);
+		}
 		}
 		
-		
-		return result;
+		return resultsDate;
 	}
-	private static String GetTweetsByTimeslot(List<Tweet> tweets,Date startdate,int timeslot,String dat,String methodChoice)
+	private static String GetTweetsByTimeslot(List<Tweet> tweets,Date startdate,int timeslot,String methodChoice)
 	throws Exception{
 		
 		
@@ -218,29 +220,27 @@ public class Main extends HttpServlet {
 		ArrayList<Tweet> prevTimeslotTweets = new ArrayList<Tweet>();
 		
 		System.out.println("start date "+startdate);
-		//System.out.println(tweets.get(0).getCreated_at());
-		//System.out.println(tweets.get(1).getCreated_at());
 		System.out.println("Date + Timeslot"+ DateUtils.addMinutes(startdate,timeslot));
 		String result="";
 		int i=0;
 		for(i=0;i < tweets.size();i++){
 			if(
-					DateUtility.stringToDate(tweets.get(i).getCreated_at()).compareTo(DateUtils.addMinutes(startdate,timeslot)) <= 0
-					&& DateUtility.stringToDate(tweets.get(i).getCreated_at()).compareTo(startdate) >=0 ){
+					df.parse(tweets.get(i).getCreated_at()).compareTo(DateUtils.addMinutes(startdate,timeslot)) <= 0
+					&& df.parse(tweets.get(i).getCreated_at()).compareTo(startdate) >=0 ){
 				
 				timeslotTweets.add(tweets.get(i));
 			}
 		}
 	
 		System.out.println("Array size: "+timeslotTweets.size());
-		if (!(timeslotTweets.isEmpty())){
+	
 		String filename1 = CreateFileFromTweets(timeslotTweets,0);
 		
 		Date newdate = DateUtils.addMinutes(startdate,-1 * timeslot);
 		for(i=0;i < tweets.size();i++){
 			if(
-				 DateUtility.stringToDate(tweets.get(i).getCreated_at()).compareTo(startdate) < 0  
-				&& DateUtility.stringToDate(tweets.get(i).getCreated_at()).compareTo(newdate) >= 0){
+					df.parse(tweets.get(i).getCreated_at()).compareTo(startdate) < 0  
+				&& df.parse(tweets.get(i).getCreated_at()).compareTo(newdate) >= 0){
 				System.out.println(tweets.get(i).getCreated_at());
 			prevTimeslotTweets.add(tweets.get(i));
 		  }
@@ -250,33 +250,27 @@ public class Main extends HttpServlet {
 		     filename2 = CreateFileFromTweets(prevTimeslotTweets,timeslot);}
 	
 		// TMM
-		
-		
 		 result = TMM(methodChoice,filename1,filename2);
-		}
+		
 		return result;
 	}
 	
 	private static String CreateFileFromTweets(List<Tweet> tweets,int timeslot)
 			throws ParseException, IOException{
-		//String fileName="";
 		
-		String time1 = tweets.get(0).getCreated_at();
-		//String time2 = tweets.get(tweets.size()-1).getCreated_at();
-		
-		Date datetime1 = DateUtility.stringToDate(time1);
+		Date datetime1 = df.parse(tweets.get(0).getCreated_at());
 		datetime1 = DateUtils.addMinutes(datetime1, timeslot);
 		
-		SimpleDateFormat df = new SimpleDateFormat("yyyy");
-		String year = df.format(datetime1); 
-		df = new SimpleDateFormat("dd");
-		String day = df.format(datetime1);
-		df = new SimpleDateFormat("MM");
-		String month = df.format(datetime1);
-		df = new SimpleDateFormat("hh");
-		String hour = df.format(datetime1);
-		df = new SimpleDateFormat("mm");
-		String minute = df.format(datetime1);
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy");
+		String year = sdf.format(datetime1); 
+		sdf = new SimpleDateFormat("dd");
+		String day = sdf.format(datetime1);
+		sdf = new SimpleDateFormat("MM");
+		String month = sdf.format(datetime1);
+		sdf = new SimpleDateFormat("hh");
+		String hour = sdf.format(datetime1);
+		sdf = new SimpleDateFormat("mm");
+		String minute = sdf.format(datetime1);
 		
 		String filename = day+"_"+month+"_"+year+"_"+hour+"_"+minute+".json";
 		//String filename = time1.substring(4,6)+"_"+time1.substring(3,5)+"_"+time1.substring(6)+"_"+time1.substring(0,2)+"_"+time1.substring(3)+".json";
@@ -290,7 +284,7 @@ public class Main extends HttpServlet {
 		}
 		
 		bufferWr.close();
-		
+		fileWrite.close();
 		return filename;
 	}
 	
@@ -317,7 +311,7 @@ public class Main extends HttpServlet {
 				  for(Ngram n:t.getKeywords()){
 					  result += n.getTerm().toString().replaceAll(":", " ");
 				  }
-				  result+="<br>";  
+				  result+="\n";  
 		        }
         }
         if ("2".equals(choice)) {

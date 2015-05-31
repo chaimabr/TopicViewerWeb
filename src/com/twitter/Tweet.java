@@ -38,14 +38,14 @@ public class Tweet implements Comparable<Tweet> {
 	public java.lang.String getText() {
 		return text;
 	}
-	private java.lang.String createdAt;
+	private java.lang.String created_at;
 
  	public void setCreated_at(java.lang.String created_at) {
-		this.createdAt = created_at;
+		this.created_at = created_at;
 	}
 
 	public java.lang.String getCreated_at() {
-		return createdAt;
+		return created_at;
 	}
 	private java.lang.Object contributors;
 
