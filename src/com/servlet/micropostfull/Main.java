@@ -10,10 +10,8 @@ import java.io.PrintWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -35,18 +33,12 @@ import org.apache.commons.lang.time.DateUtils;
 import tmm.Ngram;
 import tmm.Topic;
 import tmm.data.DataLoader;
-import Utility.DateUtility;
 
 import com.google.gson.Gson;
 import com.timeline.Asset;
 import com.timeline.Timeline;
 import com.timeline.Timeline_;
 import com.twitter.Tweet;
-
-import twitter4j.*;
-import twitter4j.conf.ConfigurationBuilder;
-
-import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -103,10 +95,11 @@ public class Main extends HttpServlet {
 		  String timeslot = request.getParameter("timeslot");
         //System.out.println("\nType 1(LDA), 2(Doc-p), 3(GraphBased), 4(sfim), 5(BNgram)");
         String menu = request.getParameter("menu");
+        String nameOffile = request.getParameter("nameOffile");
         
 		try {
 			
-			List<com.timeline.Date> timelineElements = DoIt(Integer.parseInt(timeslot),menu);
+			List<com.timeline.Date> timelineElements = DoIt(Integer.parseInt(timeslot),menu,nameOffile);
 			timeline.getTimeline().setDate(timelineElements);
 			
 			
@@ -172,10 +165,10 @@ public class Main extends HttpServlet {
 		}
 	}
 
-	private static List<com.timeline.Date> DoIt(int timeslot,String methodChoice) throws Exception{
+	private static List<com.timeline.Date> DoIt(int timeslot,String methodChoice,String nameOffile) throws Exception{
 		
 		List<com.timeline.Date> resultsDate=  new ArrayList();
-		String inputstream = "D:\\MicroFull1\\tweets0.json";
+		String inputstream = nameOffile+".json";
 		BufferedReader bufferRd = new BufferedReader(new FileReader(inputstream)); 
 		String  str="";
 		List<Tweet> tweets = new ArrayList<Tweet>();
@@ -323,7 +316,7 @@ public class Main extends HttpServlet {
 				  System.out.println("\t");
 				  for(Ngram n:t.getKeywords())
 					  result = n.getTerm().toString().replaceAll(":", " ");
-			          result += "<br>";
+			          result += "\n";
 		        }
         }
         if ("3".equals(choice)) {
@@ -334,7 +327,7 @@ public class Main extends HttpServlet {
 				  System.out.println("\t");
 				  for(Ngram n:t.getKeywords())
 					  result = n.getTerm().toString().replaceAll(":", " ");
-			          result += "<br>";
+			          result += "\n";
 		        }
         }
         if ("4".equals(choice)) {
@@ -345,7 +338,7 @@ public class Main extends HttpServlet {
 				  System.out.println("\t");
 				  for(Ngram n:t.getKeywords())
 					  result = n.getTerm().toString().replaceAll(":", " ");
-			          result += "<br>";
+			          result += "\n";
 		        }
         }
         if ("5".equals(choice)) {
@@ -356,7 +349,7 @@ public class Main extends HttpServlet {
 				  System.out.println("\t");
 				  for(Ngram n:t.getKeywords())
 					  result = n.getTerm().toString().replaceAll(":", " ");
-			          result += "<br>";
+			          result += "\n";
 		        }
         }
         

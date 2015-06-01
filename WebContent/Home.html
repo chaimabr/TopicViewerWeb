@@ -69,7 +69,7 @@ Timeline.createBandInfo({
   bandInfos[4].highlight = true;
   tl = Timeline.create(document.getElementById("my-timeline"), bandInfos);
   //Timeline.loadXML("topics.json", function(json, url) { eventSource.loadXML(json, url); });
-  tl.loadXML("http://localhost:8080/MicroFull1/Main?timeslot="+$('#timeslot').val()+"&menu="+$('#menu').val(), function(json, url) {
+  tl.loadXML("http://localhost:8080/MicroFull1/Main?timeslot="+$('#timeslot').val()+"&menu="+$('#menu').val()+"&nameOffile="+$("#nameOffile").val(), function(json, url) {
       eventSource.loadXML(json, url);
   });
 }
@@ -89,7 +89,7 @@ function onResize() {
 		
 
 		//$('#progress').hide();
-		$('#buttonSubmit').click(function(e){
+		$('#buttonSubmit2').click(function(e){
 			e.preventDefault();
 			
 			
@@ -107,6 +107,24 @@ function onResize() {
 	  <div class="panel panel-default">
 	  <div class="panel-body">
 	    <form id="inputform">
+	    <div class="input-group input-group-lg">
+		  <span class="input-group-addon" id="sizing-addon1">KeyWords</span>
+		  <input type="text" name="keyword" class="form-control" placeholder="Football, Tunisia, CharlieHebdo ..." aria-describedby="sizing-addon1">
+		</div>
+		<div class="input-group input-group-lg">
+		  <span class="input-group-addon" id="sizing-addon1">File name</span>
+		  <input type="text" name="filename" class="form-control" placeholder="Enter a file name ..." aria-describedby="sizing-addon1">
+		</div>
+		  <input type="button" style="margin-left:15px;" class="btn btn-primary btn-lg" value="Collect tweets" id="buttonSubmit1" />
+		
+		<div class="input-group input-group-lg">
+		  <span class="input-group-addon" id="sizing-addon1">Choose a file</span>
+		<select class="form-control" name="nameOffile" id="nameOffile">
+              <option value="tweets0">tweets0</option>
+              <option value="NSA">NSA</option>
+              <option value="RolandGarros">RolandGarros</option>
+		</select>
+		</div>
 	    <div class="input-group input-group-lg">
 		  <span class="input-group-addon" id="sizing-addon1">Timeslot size</span>
 		<select class="form-control" name="timeslot" id="timeslot">
@@ -127,16 +145,11 @@ function onResize() {
               <option value="5">BNgram</option>
 		</select>
 		</div>
-  <input type="button" style="margin-left:15px;" class="btn btn-primary btn-lg" value="Launch Extractor" id="buttonSubmit" />
+  <input type="button" style="margin-left:15px;" class="btn btn-primary btn-lg" value="Launch Extractor" id="buttonSubmit2" />
   </form> 
         </div>
 	  </div>
 	</div>
-
-<div class="progress" id="progress">
-  <!-- <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
-  </div> -->
-</div>
 
         <div id="my-timeline" style="height: 450px; border: 1px solid #aaa"></div>
 <noscript>
