@@ -97,6 +97,34 @@ function onResize() {
 			  
 		});
 		
+		$('#progress').hide();
+		$('#collectTweetsBtn').click(function(e){
+			e.preventDefault();
+			
+			var keywords = $('#keywords').val();
+			var duration = $('#duration').val();
+			var filename = $('#filename').val();
+			$('#progress').show();
+			$.get( "http://localhost:8080/MicroFull1/MainFetch?filename="+filename+"&duration="+duration+"&keyword="+keywords, function() {
+				// Add file to select box
+				$('#nameOffile').append('<option val="'+filename+'">'+filename+'</option>');
+			})
+			  .done(function() {
+			    alert( "Finished" );
+				  $('#progress').hide();
+			  })
+			  .fail(function() {
+			    alert( "error" );
+			    $('#progress').hide();
+			  })
+			  .always(function() {
+			  });
+			
+			
+
+			  
+		});
+		
 	});
 </script>
 <title>TopicViewer</title>
@@ -107,17 +135,32 @@ function onResize() {
 	  <div class="panel panel-default">
 	  <div class="panel-body">
 	    <form id="inputform">
-	    <div class="input-group input-group-lg">
+	    <div class="input-group input-group-lg" style="margin-bottom: 5px;">
 		  <span class="input-group-addon" id="sizing-addon1">KeyWords</span>
-		  <input type="text" name="keyword" class="form-control" placeholder="Football, Tunisia, CharlieHebdo ..." aria-describedby="sizing-addon1">
+		  <input type="text" id="keywords" name="keyword" class="form-control" placeholder="Football, Tunisia, CharlieHebdo ..." aria-describedby="sizing-addon1">
 		</div>
-		<div class="input-group input-group-lg">
+		 <div class="input-group input-group-lg" style="margin-bottom: 5px;">
+		  <span class="input-group-addon" id="sizing-addon1">Duration</span>
+		<select class="form-control" name="duration" id="duration">
+		<option value="10">10 second</option>
+              <option value="300">5 min</option>
+              <option value="600">10 min</option>
+              <option value="900">15 min</option>
+              <option value="1200">20 min</option>
+              <option value="1800">30 min </option>
+		</select>
+		</div>
+		<div class="input-group input-group-lg" style="margin-bottom: 5px;">
 		  <span class="input-group-addon" id="sizing-addon1">File name</span>
-		  <input type="text" name="filename" class="form-control" placeholder="Enter a file name ..." aria-describedby="sizing-addon1">
+		  <input type="text" id="filename" name="filename" class="form-control" placeholder="Enter a file name ..." aria-describedby="sizing-addon1">
 		</div>
-		  <input type="button" style="margin-left:15px;" class="btn btn-primary btn-lg" value="Collect tweets" id="buttonSubmit1" />
-		
-		<div class="input-group input-group-lg">
+		  <input style="margin-bottom: 5px;" type="button" style="margin-left:15px;" class="btn btn-primary btn-lg" value="Collect tweets" id="collectTweetsBtn" />
+		<div class="progress" id="progress" style="margin-bottom: 5px;">
+  <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+  </div>
+</div>
+
+		<div class="input-group input-group-lg" style="margin-bottom: 5px;">
 		  <span class="input-group-addon" id="sizing-addon1">Choose a file</span>
 		<select class="form-control" name="nameOffile" id="nameOffile">
               <option value="tweets0">tweets0</option>
@@ -125,7 +168,7 @@ function onResize() {
               <option value="RolandGarros">RolandGarros</option>
 		</select>
 		</div>
-	    <div class="input-group input-group-lg">
+	    <div class="input-group input-group-lg" style="margin-bottom: 5px;">
 		  <span class="input-group-addon" id="sizing-addon1">Timeslot size</span>
 		<select class="form-control" name="timeslot" id="timeslot">
               <option value="1">1 min</option>
@@ -135,7 +178,7 @@ function onResize() {
               <option value="1440">1 day</option>
 		</select>
 		</div>
-		<div class="input-group input-group-lg">
+		<div class="input-group input-group-lg" style="margin-bottom: 5px;">
 		  <span class="input-group-addon" id="sizing-addon1">Method</span>
 		<select class="form-control" name="menu" id="menu">
               <option value="1">LDA</option>
@@ -145,7 +188,7 @@ function onResize() {
               <option value="5">BNgram</option>
 		</select>
 		</div>
-  <input type="button" style="margin-left:15px;" class="btn btn-primary btn-lg" value="Launch Extractor" id="buttonSubmit2" />
+  <input style="margin-bottom: 5px;" type="button" style="margin-left:15px;" class="btn btn-primary btn-lg" value="Launch Extractor" id="buttonSubmit2" />
   </form> 
         </div>
 	  </div>
