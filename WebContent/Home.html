@@ -20,8 +20,9 @@
 
 <script>
 var tl;
+var eventSource;
 function onLoad() {
-	var eventSource = new Timeline.DefaultEventSource();
+	eventSource = new Timeline.DefaultEventSource();
 	
   var bandInfos = [
 Timeline.createBandInfo({
@@ -59,19 +60,32 @@ Timeline.createBandInfo({
         intervalPixels: 200
     })
   ];
-  bandInfos[1].syncWith = 0;
+  //bandInfos[1].syncWith = 0;
   bandInfos[1].highlight = true;
-  bandInfos[2].syncWith = 1;
+  //bandInfos[2].syncWith = 1;
   bandInfos[2].highlight = true;
-  bandInfos[3].syncWith = 2;
+  //bandInfos[3].syncWith = 2;
   bandInfos[3].highlight = true;
-  bandInfos[4].syncWith = 3;
+  //bandInfos[4].syncWith = 3;
   bandInfos[4].highlight = true;
+  
+ 
+  
   tl = Timeline.create(document.getElementById("my-timeline"), bandInfos);
   //Timeline.loadXML("topics.json", function(json, url) { eventSource.loadXML(json, url); });
+  
   tl.loadXML("http://localhost:8080/MicroFull1/Main?timeslot="+$('#timeslot').val()+"&menu="+$('#menu').val()+"&nameOffile="+$("#nameOffile").val(), function(json, url) {
       eventSource.loadXML(json, url);
+      
+      var timelineDate= eventSource.getEvent(0).getStart();
+      tl.getBand(0).setCenterVisibleDate(timelineDate);
+      tl.getBand(1).setCenterVisibleDate(timelineDate);
+      tl.getBand(2).setCenterVisibleDate(timelineDate);
+      tl.getBand(3).setCenterVisibleDate(timelineDate);
+      tl.getBand(4).setCenterVisibleDate(timelineDate);
   });
+  
+  //tl.getBand(2).setMaxVisibleDate(new Date("06/06/2015 00:00"));
 }
 
 var resizeTimerID = null;
@@ -86,7 +100,70 @@ function onResize() {
     
 	$(document).ready(function(){
 		
+		$('#nameOffile').on('change', function (e) {
+		    var optionSelected = $("option:selected", this);
+		    var valueSelected = this.value;
+		    
+		    
+		    //var duration= "tweets0_by_twitter_30.json";
+		    var ptIndex = valueSelected.indexOf(".");
+		    var underscoreIndex = valueSelected.lastIndexOf("_");
+		    var duration = valueSelected.substring(underscoreIndex+1,ptIndex);
+		    //alert(duration);
+		    
+		    $('#timeslot').empty();
+		    if(duration == "1"){
+		    	$('#timeslot').append('<option val="1">1 min</option>');
+		    	
+		    } else if(duration == "5"){
+		    	$('#timeslot').append('<option val="1">1 min</option>');
+		    	$('#timeslot').append('<option val="5">5 mins</option>');
+		    	
+		    } else if(duration == "10"){
+		    	$('#timeslot').append('<option val="1">1 min</option>');
+		    	$('#timeslot').append('<option val="5">5 mins</option>');
+		    	$('#timeslot').append('<option val="10">10 mins</option>');
+		    	
+		    } else if(duration == "15"){
+		    	
+		    	$('#timeslot').append('<option val="1">1 min</option>');
+		    	$('#timeslot').append('<option val="5">5 mins</option>');
+		    	$('#timeslot').append('<option val="10">10 mins</option>');
+		    	$('#timeslot').append('<option val="15">15 mins</option>');
+		    	
+		    } else if(duration == "20"){
+		    	
+		    	$('#timeslot').append('<option val="1">1 min</option>');
+		    	$('#timeslot').append('<option val="5">5 mins</option>');
+		    	$('#timeslot').append('<option val="10">10 mins</option>');
+		    	$('#timeslot').append('<option val="15">15 mins</option>');
+		    	$('#timeslot').append('<option val="20">20 mins</option>');
+		    	
+		    } else if(duration == "30"){
+		    	$('#timeslot').append('<option val="1">1 min</option>');
+		    	$('#timeslot').append('<option val="5">5 mins</option>');
+		    	$('#timeslot').append('<option val="10">10 mins</option>');
+		    	$('#timeslot').append('<option val="15">15 mins</option>');
+		    	$('#timeslot').append('<option val="20">20 mins</option>');
+		    	$('#timeslot').append('<option val="30">30 mins</option>');
+		    }
+		    
+		});
 		
+		$.get("http://localhost:8080/MicroFull1/FolderServlet",function(data){
+			
+			var files = $.parseJSON(data);
+			for(var i=0;i<files.length;i++){
+				var filename = files[i];
+				$('#nameOffile').append('<option val="'+filename+'">'+filename+'</option>');
+			}
+			alert(files);
+		})
+	  	.fail(function() {
+		    alert( "error" );
+		  }).done(function(data){
+			//alert(data);
+		});
 
 		//$('#progress').hide();
 		$('#buttonSubmit2').click(function(e){
@@ -103,11 +180,13 @@ function onResize() {
 			
 			var keywords = $('#keywords').val();
 			var duration = $('#duration').val();
+			
+			var username = $('#username').val();
 			var filename = $('#filename').val();
 			$('#progress').show();
-			$.get( "http://localhost:8080/MicroFull1/MainFetch?filename="+filename+"&duration="+duration+"&keyword="+keywords, function() {
+			$.get( "http://localhost:8080/MicroFull1/MainFetch?filename="+filename+"&duration="+duration+"&keyword="+keywords+"&username="+username, function() {
 				// Add file to select box
-				$('#nameOffile').append('<option val="'+filename+'">'+filename+'</option>');
+				$('#nameOffile').append('<option val="'+filename+'_by_'+username+'_'+(parseInt(duration)/60)+'.json">'+filename+'_by_'+username+'_'+(parseInt(duration)/60)+'.json</option>');
 			})
 			  .done(function() {
 			    alert( "Finished" );
@@ -124,6 +203,10 @@ function onResize() {
 
 			  
 		});
+		
+		
+
+
 		
 	});
 </script>
@@ -142,7 +225,7 @@ function onResize() {
 		 <div class="input-group input-group-lg" style="margin-bottom: 5px;">
 		  <span class="input-group-addon" id="sizing-addon1">Duration</span>
 		<select class="form-control" name="duration" id="duration">
-		<option value="10">10 second</option>
+		      <option value="60">1 min</option>
               <option value="300">5 min</option>
               <option value="600">10 min</option>
               <option value="900">15 min</option>
@@ -154,6 +237,10 @@ function onResize() {
 		  <span class="input-group-addon" id="sizing-addon1">File name</span>
 		  <input type="text" id="filename" name="filename" class="form-control" placeholder="Enter a file name ..." aria-describedby="sizing-addon1">
 		</div>
+		<div class="input-group input-group-lg" style="margin-bottom: 5px;">
+		  <span class="input-group-addon" id="sizing-addon1">User name</span>
+		  <input type="text" id="username" name="username" class="form-control" placeholder="Enter your name ..." aria-describedby="sizing-addon1">
+		</div>
 		  <input style="margin-bottom: 5px;" type="button" style="margin-left:15px;" class="btn btn-primary btn-lg" value="Collect tweets" id="collectTweetsBtn" />
 		<div class="progress" id="progress" style="margin-bottom: 5px;">
   <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
@@ -163,19 +250,20 @@ function onResize() {
 		<div class="input-group input-group-lg" style="margin-bottom: 5px;">
 		  <span class="input-group-addon" id="sizing-addon1">Choose a file</span>
 		<select class="form-control" name="nameOffile" id="nameOffile">
-              <option value="tweets0">tweets0</option>
+              <!-- <option value="tweets0">tweets0</option>
               <option value="NSA">NSA</option>
-              <option value="RolandGarros">RolandGarros</option>
+              <option value="RolandGarros">RolandGarros</option>-->
+              <option value="0"></option>
 		</select>
 		</div>
 	    <div class="input-group input-group-lg" style="margin-bottom: 5px;">
 		  <span class="input-group-addon" id="sizing-addon1">Timeslot size</span>
 		<select class="form-control" name="timeslot" id="timeslot">
-              <option value="1">1 min</option>
+              <!--<option value="1">1 min</option>
               <option value="10">10 min</option>
               <option value="60">1 h</option>
               <option value="720">12 h</option>
-              <option value="1440">1 day</option>
+              <option value="1440">1 day</option>-->
 		</select>
 		</div>
 		<div class="input-group input-group-lg" style="margin-bottom: 5px;">

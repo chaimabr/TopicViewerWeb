@@ -75,6 +75,7 @@ public class Main extends HttpServlet {
 			
         String keyword = request.getParameter("keyword");
         String fileNameParam = request.getParameter("filename");
+        String userNameParam = request.getParameter("username");
         durationParam = request.getParameter("duration");
         lStartTime = new Date().getTime();
         
@@ -87,7 +88,7 @@ public class Main extends HttpServlet {
         
 		try {
 
-			DoIt(keyword,fileNameParam);
+			DoIt(keyword,fileNameParam,userNameParam);
 
 			
 		} catch (NumberFormatException e) {
@@ -101,7 +102,6 @@ public class Main extends HttpServlet {
         /**********************************/
        
 			obj.wait();
-
 			    //obj.wait();
 			
 			
@@ -109,7 +109,7 @@ public class Main extends HttpServlet {
 	        PrintWriter out = response.getWriter();
 	        try {
 	            /*  output   */
-	        	String fileName = fileNameParam+".json";
+	        	String fileName = "tweetsFiles/"+fileNameParam+"_by_"+userNameParam+"_"+Integer.parseInt(durationParam)/60+".json";
 	        	BufferedReader bufferRd = new BufferedReader(new FileReader(fileName)); 
 	        	String str="";
 	    		while((str = bufferRd.readLine()) != null) 
@@ -129,11 +129,14 @@ public class Main extends HttpServlet {
 		}
 	}
 
-	private static void DoIt(String keyword,String fileName) throws Exception{
+	private static void DoIt(String keyword,String fileName,String userNameParam) throws Exception{
 		//Main collector = new Main();
 		Main collector = new Main();
 		collector.setMaxJsonFileSize(100*1024); // 100MB batches
-		collector.open(fileName+".json");
+		//fileName = "tweetsFiles/"+fileName+"_by_"+userNameParam+".json";
+		fileName = "tweetsFiles/"+fileName+"_by_"+userNameParam+"_"+Integer.parseInt(durationParam)/60+".json";
+    	
+		collector.open(fileName);
 		
 		long[] seeds = FileUtil.convertStringToLongs(
 				FileUtil.readTokensFromFile("seeds.txt"));
@@ -166,7 +169,7 @@ public class Main extends HttpServlet {
 			public void onStatus(Status status) {
 				synchronized(obj){
 				try {
-					System.out.println("Tweet collected ...");
+					//System.out.println("Tweet collected ...");
 					long lEndTime = new Date().getTime();
 					 
 					long difference = lEndTime - lStartTime;

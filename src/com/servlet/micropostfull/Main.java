@@ -134,13 +134,15 @@ public class Main extends HttpServlet {
 	    		doc.appendChild(rootElement);
 	    		
 	    		System.out.println(timeline.getTimeline().getDate().size());
-	    		
+	    		int i=0;
 	    		for(com.timeline.Date date : timeline.getTimeline().getDate()){
 		    		Element event = doc.createElement("event");
 		    		event.setAttribute("start", date.getStartDate());
 		    		event.setAttribute("title", date.getHeadline());
 		    		event.setAttribute("isDuration", "false");
+		    		event.setAttribute("id", ""+i);
 		    		rootElement.appendChild(event);
+		    		i++;
 	    		}
 	    		
 	    		//System.out.println("XML:"+doc.getTextContent());
@@ -168,7 +170,7 @@ public class Main extends HttpServlet {
 	private static List<com.timeline.Date> DoIt(int timeslot,String methodChoice,String nameOffile) throws Exception{
 		
 		List<com.timeline.Date> resultsDate=  new ArrayList();
-		String inputstream = nameOffile+".json";
+		String inputstream = "tweetsFiles/"+nameOffile;
 		BufferedReader bufferRd = new BufferedReader(new FileReader(inputstream)); 
 		String  str="";
 		List<Tweet> tweets = new ArrayList<Tweet>();
@@ -193,7 +195,7 @@ public class Main extends HttpServlet {
 			){
 			
 			System.out.println(startDate);
-			String txt = GetTweetsByTimeslot(tweets,startDate,timeslot,methodChoice);
+			String txt = GetTweetsByTimeslot(tweets,startDate,timeslot,methodChoice,nameOffile);
 			System.out.println("txt = "+txt);
 			startDate = DateUtils.addMinutes(startDate, timeslot);
 			com.timeline.Date newDate = new com.timeline.Date();
@@ -205,7 +207,7 @@ public class Main extends HttpServlet {
 		
 		return resultsDate;
 	}
-	private static String GetTweetsByTimeslot(List<Tweet> tweets,Date startdate,int timeslot,String methodChoice)
+	private static String GetTweetsByTimeslot(List<Tweet> tweets,Date startdate,int timeslot,String methodChoice,String nameOffile)
 	throws Exception{
 		
 		
@@ -227,7 +229,7 @@ public class Main extends HttpServlet {
 	
 		System.out.println("Array size: "+timeslotTweets.size());
 	
-		String filename1 = CreateFileFromTweets(timeslotTweets,0);
+		String filename1 = CreateFileFromTweets(timeslotTweets,0,nameOffile);
 		
 		Date newdate = DateUtils.addMinutes(startdate,-1 * timeslot);
 		for(i=0;i < tweets.size();i++){
@@ -240,7 +242,7 @@ public class Main extends HttpServlet {
 		}
 		String filename2="";
 		if (prevTimeslotTweets.size()>0){
-		     filename2 = CreateFileFromTweets(prevTimeslotTweets,timeslot);}
+		     filename2 = CreateFileFromTweets(prevTimeslotTweets,timeslot,nameOffile);}
 	
 		// TMM
 		 result = TMM(methodChoice,filename1,filename2);
@@ -248,7 +250,7 @@ public class Main extends HttpServlet {
 		return result;
 	}
 	
-	private static String CreateFileFromTweets(List<Tweet> tweets,int timeslot)
+	private static String CreateFileFromTweets(List<Tweet> tweets,int timeslot,String nameOffile)
 			throws ParseException, IOException{
 		
 		Date datetime1 = df.parse(tweets.get(0).getCreated_at());
@@ -265,7 +267,7 @@ public class Main extends HttpServlet {
 		sdf = new SimpleDateFormat("mm");
 		String minute = sdf.format(datetime1);
 		
-		String filename = day+"_"+month+"_"+year+"_"+hour+"_"+minute+".json";
+		String filename = nameOffile+"_"+day+"_"+month+"_"+year+"_"+hour+"_"+minute+".json";
 		//String filename = time1.substring(4,6)+"_"+time1.substring(3,5)+"_"+time1.substring(6)+"_"+time1.substring(0,2)+"_"+time1.substring(3)+".json";
 		FileWriter fileWrite = new FileWriter(new File(filename));
 		BufferedWriter bufferWr = new BufferedWriter(fileWrite);
@@ -304,7 +306,7 @@ public class Main extends HttpServlet {
 				  for(Ngram n:t.getKeywords()){
 					  result += n.getTerm().toString().replaceAll(":", " ");
 				  }
-				  result+="\n";  
+				  result+=" \\ ";  
 		        }
         }
         if ("2".equals(choice)) {
@@ -316,7 +318,7 @@ public class Main extends HttpServlet {
 				  System.out.println("\t");
 				  for(Ngram n:t.getKeywords())
 					  result = n.getTerm().toString().replaceAll(":", " ");
-			          result += "\n";
+			          result += " \\ ";
 		        }
         }
         if ("3".equals(choice)) {
@@ -327,7 +329,7 @@ public class Main extends HttpServlet {
 				  System.out.println("\t");
 				  for(Ngram n:t.getKeywords())
 					  result = n.getTerm().toString().replaceAll(":", " ");
-			          result += "\n";
+			          result += " \\ ";  
 		        }
         }
         if ("4".equals(choice)) {
@@ -338,7 +340,7 @@ public class Main extends HttpServlet {
 				  System.out.println("\t");
 				  for(Ngram n:t.getKeywords())
 					  result = n.getTerm().toString().replaceAll(":", " ");
-			          result += "\n";
+			          result += " \\ ";  
 		        }
         }
         if ("5".equals(choice)) {
@@ -349,7 +351,7 @@ public class Main extends HttpServlet {
 				  System.out.println("\t");
 				  for(Ngram n:t.getKeywords())
 					  result = n.getTerm().toString().replaceAll(":", " ");
-			          result += "\n";
+			          result += " \\ ";  
 		        }
         }
         
