@@ -113,39 +113,39 @@ function onResize() {
 		    
 		    $('#timeslot').empty();
 		    if(duration == "1"){
-		    	$('#timeslot').append('<option val="1">1 min</option>');
+		    	$('#timeslot').append('<option value="1">1 min</option>');
 		    	
 		    } else if(duration == "5"){
-		    	$('#timeslot').append('<option val="1">1 min</option>');
-		    	$('#timeslot').append('<option val="5">5 mins</option>');
+		    	$('#timeslot').append('<option value="1">1 min</option>');
+		    	$('#timeslot').append('<option value="5">5 mins</option>');
 		    	
 		    } else if(duration == "10"){
-		    	$('#timeslot').append('<option val="1">1 min</option>');
-		    	$('#timeslot').append('<option val="5">5 mins</option>');
-		    	$('#timeslot').append('<option val="10">10 mins</option>');
+		    	$('#timeslot').append('<option value="1">1 min</option>');
+		    	$('#timeslot').append('<option value="5">5 mins</option>');
+		    	$('#timeslot').append('<option value="10">10 mins</option>');
 		    	
 		    } else if(duration == "15"){
 		    	
-		    	$('#timeslot').append('<option val="1">1 min</option>');
-		    	$('#timeslot').append('<option val="5">5 mins</option>');
-		    	$('#timeslot').append('<option val="10">10 mins</option>');
-		    	$('#timeslot').append('<option val="15">15 mins</option>');
+		    	$('#timeslot').append('<option value="1">1 min</option>');
+		    	$('#timeslot').append('<option value="5">5 mins</option>');
+		    	$('#timeslot').append('<option value="10">10 mins</option>');
+		    	$('#timeslot').append('<option value="15">15 mins</option>');
 		    	
 		    } else if(duration == "20"){
 		    	
-		    	$('#timeslot').append('<option val="1">1 min</option>');
-		    	$('#timeslot').append('<option val="5">5 mins</option>');
-		    	$('#timeslot').append('<option val="10">10 mins</option>');
-		    	$('#timeslot').append('<option val="15">15 mins</option>');
-		    	$('#timeslot').append('<option val="20">20 mins</option>');
+		    	$('#timeslot').append('<option value="1">1 min</option>');
+		    	$('#timeslot').append('<option value="5">5 mins</option>');
+		    	$('#timeslot').append('<option value="10">10 mins</option>');
+		    	$('#timeslot').append('<option value="15">15 mins</option>');
+		    	$('#timeslot').append('<option value="20">20 mins</option>');
 		    	
 		    } else if(duration == "30"){
-		    	$('#timeslot').append('<option val="1">1 min</option>');
-		    	$('#timeslot').append('<option val="5">5 mins</option>');
-		    	$('#timeslot').append('<option val="10">10 mins</option>');
-		    	$('#timeslot').append('<option val="15">15 mins</option>');
-		    	$('#timeslot').append('<option val="20">20 mins</option>');
-		    	$('#timeslot').append('<option val="30">30 mins</option>');
+		    	$('#timeslot').append('<option value="1">1 min</option>');
+		    	$('#timeslot').append('<option value="5">5 mins</option>');
+		    	$('#timeslot').append('<option value="10">10 mins</option>');
+		    	$('#timeslot').append('<option value="15">15 mins</option>');
+		    	$('#timeslot').append('<option value="20">20 mins</option>');
+		    	$('#timeslot').append('<option value="30">30 mins</option>');
 		    }
 		    
 		});
@@ -157,7 +157,7 @@ function onResize() {
 				var filename = files[i];
 				$('#nameOffile').append('<option val="'+filename+'">'+filename+'</option>');
 			}
-			alert(files);
+			//alert(files);
 		})
 	  	.fail(function() {
 		    alert( "error" );
@@ -169,8 +169,16 @@ function onResize() {
 		$('#buttonSubmit2').click(function(e){
 			e.preventDefault();
 			
+			var timeslot = $('#timeslot').val();
+			var method = $('#menu').val();
+			var fileName = $("#nameOffile").val();
 			
-			onLoad();
+			
+			if(timeslot != null && fileName != null){
+				onLoad();	
+			} else {
+				alert("Please select a file name and a timeslot");
+			}
 			  
 		});
 		

@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.Files;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -39,6 +40,7 @@ import com.timeline.Asset;
 import com.timeline.Timeline;
 import com.timeline.Timeline_;
 import com.twitter.Tweet;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -242,7 +244,17 @@ public class Main extends HttpServlet {
 		}
 		String filename2="";
 		if (prevTimeslotTweets.size()>0){
-		     filename2 = CreateFileFromTweets(prevTimeslotTweets,timeslot,nameOffile);}
+		     filename2 = CreateFileFromTweets(prevTimeslotTweets,timeslot,nameOffile);
+		     // Rename file
+		 
+		     //File newFile = new File("previousTimeSlot.json");
+		     //Files.move(new File(filename2).toPath(), newFile.toPath());
+		     File oldFile = new File(filename2);
+		     Boolean isSuccess =  oldFile.renameTo(new File("previousTimeSlot.json"));
+		     if(isSuccess){
+		    	 filename2 ="previousTimeSlot.json";
+		     }
+		}
 	
 		// TMM
 		 result = TMM(methodChoice,filename1,filename2);
@@ -354,7 +366,6 @@ public class Main extends HttpServlet {
 			          result += " \\ ";  
 		        }
         }
-        
         return result;
 	}
 
