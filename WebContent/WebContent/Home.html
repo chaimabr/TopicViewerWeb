@@ -1,0 +1,308 @@
+ <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+ <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+ <script src="http://api.simile-widgets.org/timeline/2.3.1/timeline-api.js?bundle=true" type="text/javascript"></script>
+<script src="js/moment.min.js"></script>
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+
+<!-- Optional theme -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
+
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+ 
+        <!--[if lt IE 9]>
+          <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+
+
+<script>
+var tl;
+var eventSource;
+function onLoad() {
+	eventSource = new Timeline.DefaultEventSource();
+	
+  var bandInfos = [
+Timeline.createBandInfo({
+     width:          "40%",
+     eventSource:    eventSource,
+     intervalUnit:   Timeline.DateTime.MINUTE, 
+     intervalPixels: 300
+ }),
+Timeline.createBandInfo({
+	 overview:       true,
+     width:          "20%",
+     eventSource:    eventSource,
+     intervalUnit:   Timeline.DateTime.HOUR, 
+     intervalPixels: 200
+ }),
+Timeline.createBandInfo({
+	  overview:       true,
+      width:          "20%",
+      eventSource:    eventSource,
+      intervalUnit:   Timeline.DateTime.DAY, 
+      intervalPixels: 200
+  }),
+    Timeline.createBandInfo({
+    	 overview:       true,
+   	 eventSource:    eventSource,
+        width:          "10%", 
+        intervalUnit:   Timeline.DateTime.MONTH, 
+        intervalPixels: 100
+    }),
+    Timeline.createBandInfo({
+    	 overview:       true,
+        width:          "10%",
+        eventSource:    eventSource,
+        intervalUnit:   Timeline.DateTime.YEAR, 
+        intervalPixels: 200
+    })
+  ];
+  //bandInfos[1].syncWith = 0;
+  bandInfos[1].highlight = true;
+  //bandInfos[2].syncWith = 1;
+  bandInfos[2].highlight = true;
+  //bandInfos[3].syncWith = 2;
+  bandInfos[3].highlight = true;
+  //bandInfos[4].syncWith = 3;
+  bandInfos[4].highlight = true;
+  
+ 
+  
+  tl = Timeline.create(document.getElementById("my-timeline"), bandInfos);
+  //Timeline.loadXML("topics.json", function(json, url) { eventSource.loadXML(json, url); });
+  
+  tl.loadXML("http://localhost:8080/MicroFull1/Main?timeslot="+$('#timeslot').val()+"&menu="+$('#menu').val()+"&nameOffile="+$("#nameOffile").val(), function(json, url) {
+      eventSource.loadXML(json, url);
+      
+      var timelineDate= eventSource.getEvent(0).getStart();
+      tl.getBand(0).setCenterVisibleDate(timelineDate);
+      tl.getBand(1).setCenterVisibleDate(timelineDate);
+      tl.getBand(2).setCenterVisibleDate(timelineDate);
+      tl.getBand(3).setCenterVisibleDate(timelineDate);
+      tl.getBand(4).setCenterVisibleDate(timelineDate);
+  });
+  
+  //tl.getBand(2).setMaxVisibleDate(new Date("06/06/2015 00:00"));
+}
+
+var resizeTimerID = null;
+function onResize() {
+    if (resizeTimerID == null) {
+        resizeTimerID = window.setTimeout(function() {
+            resizeTimerID = null;
+            tl.layout();
+        }, 500);
+    }
+}
+    
+	$(document).ready(function(){
+		
+		$('#nameOffile').on('change', function (e) {
+		    var optionSelected = $("option:selected", this);
+		    var valueSelected = this.value;
+		    
+		    
+		    //var duration= "tweets0_by_twitter_30.json";
+		    var ptIndex = valueSelected.indexOf(".");
+		    var underscoreIndex = valueSelected.lastIndexOf("_");
+		    var duration = valueSelected.substring(underscoreIndex+1,ptIndex);
+		    //alert(duration);
+		    
+		    $('#timeslot').empty();
+		    if(duration == "1"){
+		    	$('#timeslot').append('<option value="1">1 min</option>');
+		    	
+		    } else if(duration == "5"){
+		    	$('#timeslot').append('<option value="1">1 min</option>');
+		    	$('#timeslot').append('<option value="5">5 mins</option>');
+		    	
+		    } else if(duration == "10"){
+		    	$('#timeslot').append('<option value="1">1 min</option>');
+		    	$('#timeslot').append('<option value="5">5 mins</option>');
+		    	$('#timeslot').append('<option value="10">10 mins</option>');
+		    	
+		    } else if(duration == "15"){
+		    	
+		    	$('#timeslot').append('<option value="1">1 min</option>');
+		    	$('#timeslot').append('<option value="5">5 mins</option>');
+		    	$('#timeslot').append('<option value="10">10 mins</option>');
+		    	$('#timeslot').append('<option value="15">15 mins</option>');
+		    	
+		    } else if(duration == "20"){
+		    	
+		    	$('#timeslot').append('<option value="1">1 min</option>');
+		    	$('#timeslot').append('<option value="5">5 mins</option>');
+		    	$('#timeslot').append('<option value="10">10 mins</option>');
+		    	$('#timeslot').append('<option value="15">15 mins</option>');
+		    	$('#timeslot').append('<option value="20">20 mins</option>');
+		    	
+		    } else if(duration == "30"){
+		    	$('#timeslot').append('<option value="1">1 min</option>');
+		    	$('#timeslot').append('<option value="5">5 mins</option>');
+		    	$('#timeslot').append('<option value="10">10 mins</option>');
+		    	$('#timeslot').append('<option value="15">15 mins</option>');
+		    	$('#timeslot').append('<option value="20">20 mins</option>');
+		    	$('#timeslot').append('<option value="30">30 mins</option>');
+		    }
+		    
+		});
+		
+		$.get("http://localhost:8080/MicroFull1/FolderServlet",function(data){
+			
+			var files = $.parseJSON(data);
+			for(var i=0;i<files.length;i++){
+				var filename = files[i];
+				$('#nameOffile').append('<option val="'+filename+'">'+filename+'</option>');
+			}
+			//alert(files);
+		})
+	  	.fail(function() {
+		    alert( "error" );
+		  }).done(function(data){
+			//alert(data);
+		});
+
+		//$('#progress').hide();
+		$('#buttonSubmit2').click(function(e){
+			e.preventDefault();
+			
+			var timeslot = $('#timeslot').val();
+			var method = $('#menu').val();
+			var fileName = $("#nameOffile").val();
+			
+			
+			if(timeslot != null && fileName != null){
+				onLoad();	
+			} else {
+				alert("Please select a file name and a timeslot");
+			}
+			  
+		});
+		
+		$('#progress').hide();
+		$('#collectTweetsBtn').click(function(e){
+			e.preventDefault();
+			
+			var keywords = $('#keywords').val();
+			var duration = $('#duration').val();
+			
+			var username = $('#username').val();
+			var filename = $('#filename').val();
+			$('#progress').show();
+			$.get( "http://localhost:8080/MicroFull1/MainFetch?filename="+filename+"&duration="+duration+"&keyword="+keywords+"&username="+username, function() {
+				// Add file to select box
+				$('#nameOffile').append('<option val="'+filename+'_by_'+username+'_'+(parseInt(duration)/60)+'.json">'+filename+'_by_'+username+'_'+(parseInt(duration)/60)+'.json</option>');
+			})
+			  .done(function() {
+			    alert( "Finished" );
+				  $('#progress').hide();
+			  })
+			  .fail(function() {
+			    alert( "error" );
+			    $('#progress').hide();
+			  })
+			  .always(function() {
+			  });
+			
+			
+
+			  
+		});
+		
+		
+
+
+		
+	});
+</script>
+<title>TopicViewer</title>
+</head>
+<body onresize="onResize();">
+<div class="jumbotron">
+  <h1 style="text-align:center"><img  src="images/head.png"></h1>
+	  <div class="panel panel-default">
+	  <div class="panel-body">
+	    <form id="inputform">
+	    <div class="input-group input-group-lg" style="margin-bottom: 5px;">
+		  <span class="input-group-addon" id="sizing-addon1">KeyWords</span>
+		  <input type="text" id="keywords" name="keyword" class="form-control" placeholder="Football, Tunisia, CharlieHebdo ..." aria-describedby="sizing-addon1">
+		</div>
+		 <div class="input-group input-group-lg" style="margin-bottom: 5px;">
+		  <span class="input-group-addon" id="sizing-addon1">Duration</span>
+		<select class="form-control" name="duration" id="duration">
+		      <option value="60">1 min</option>
+              <option value="300">5 min</option>
+              <option value="600">10 min</option>
+              <option value="900">15 min</option>
+              <option value="1200">20 min</option>
+              <option value="1800">30 min </option>
+		</select>
+		</div>
+		<div class="input-group input-group-lg" style="margin-bottom: 5px;">
+		  <span class="input-group-addon" id="sizing-addon1">File name</span>
+		  <input type="text" id="filename" name="filename" class="form-control" placeholder="Enter a file name ..." aria-describedby="sizing-addon1">
+		</div>
+		<div class="input-group input-group-lg" style="margin-bottom: 5px;">
+		  <span class="input-group-addon" id="sizing-addon1">User name</span>
+		  <input type="text" id="username" name="username" class="form-control" placeholder="Enter your name ..." aria-describedby="sizing-addon1">
+		</div>
+		  <input style="margin-bottom: 5px;" type="button" style="margin-left:35px;" class="btn btn-primary btn-lg" value="Collect tweets" id="collectTweetsBtn" />
+		<div class="progress" id="progress" style="margin-bottom: 5px;">
+  <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+  </div>
+</div>
+
+		<div class="input-group input-group-lg" style="margin-bottom: 5px;">
+		  <span class="input-group-addon" id="sizing-addon1">Choose a file</span>
+		<select class="form-control" name="nameOffile" id="nameOffile">
+              <!-- <option value="tweets0">tweets0</option>
+              <option value="NSA">NSA</option>
+              <option value="RolandGarros">RolandGarros</option>-->
+              <option value="0"></option>
+		</select>
+		</div>
+	    <div class="input-group input-group-lg" style="margin-bottom: 5px;">
+		  <span class="input-group-addon" id="sizing-addon1">Timeslot size</span>
+		<select class="form-control" name="timeslot" id="timeslot">
+              <!--<option value="1">1 min</option>
+              <option value="10">10 min</option>
+              <option value="60">1 h</option>
+              <option value="720">12 h</option>
+              <option value="1440">1 day</option>-->
+		</select>
+		</div>
+		<div class="input-group input-group-lg" style="margin-bottom: 5px;">
+		  <span class="input-group-addon" id="sizing-addon1">Method</span>
+		<select class="form-control" name="menu" id="menu">
+              <option value="1">LDA</option>
+              <option value="2">Doc-p</option>
+              <option value="3">Graphbased</option>
+              <option value="4">SFIM</option>
+              <option value="5">BNgram</option>
+		</select>
+		</div>
+  <input style="margin-bottom: 5px;" type="button" style="margin-left:15px;" class="btn btn-primary btn-lg" value="Launch Extractor" id="buttonSubmit2" />
+  </form> 
+        </div>
+	  </div>
+	</div>
+
+        <div id="my-timeline" style="height: 450px; border: 1px solid #aaa"></div>
+<noscript>
+This page uses Javascript to show you a Timeline. Please enable Javascript in your browser to see the full page. Thank you.
+</noscript>
+        
+        <!-- JavaScript includes - jQuery, turn.js and our own script.js -->
+		<script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+		<script src="js/timeline-min.js"></script>
+		<script src="js/story-embed.js"></script>
+		<!-- <script src="timeline/assets/js/script.js"></script>-->
+</body>
+<footer style="text-align: center;">
+	<span class="logos eurecom"><a href="http://www.eurecom.fr/en"><img src="images/logo.png" style="
+    width: 100px;"></a></span>
+</footer>
+</html>
